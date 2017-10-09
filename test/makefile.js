@@ -5,3 +5,13 @@ target.test = async function() {
   await docker("info");
   console.log("cououc");
 };
+
+target.execReturnStdout = async function() {
+  const list = await exec("ls -lrt", true);
+  console.log("list: ", list);
+};
+
+target.execNormal = async function() {
+  console.log("list: ");
+  await exec("ls -lrt");
+};

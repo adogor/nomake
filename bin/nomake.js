@@ -6,15 +6,15 @@ const camelCase = require("camelcase");
 const decamelize = require("decamelize");
 const prettyjson = require("prettyjson");
 const fse = require("fs-extra");
+const { execute, register, cmd } = require("../src/exec");
 
 let ok = false;
 
 global.target = {};
 
-global.exec = require("../src/exec-async");
-global.execSync = require("../src/exec-sync");
-global.cmd = require("../src/cmd");
-global.register = require("../src/register");
+global.exec = execute;
+global.cmd = cmd;
+global.register = register;
 
 global.prettyjson = prettyjson.render;
 
