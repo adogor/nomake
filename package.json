@@ -1,0 +1,33 @@
+{
+  "name": "nomake",
+  "version": "0.0.1",
+  "description": "Node.js make, use async/await with few helpers to script",
+  "keywords": ["npm", "node", "make", "bash", "script", "async"],
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\""
+  },
+  "homepage": "https://github.com/adogor/nomake",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/adogor/nomake.git"
+  },
+  "author": {
+    "name": "Adrien Ogor",
+    "email": "adrien.ogor@gmail.com",
+    "url": "http://github.com/adogor/"
+  },
+  "license": "MIT",
+  "bin": {
+    "nomake": "./bin/nomake.js"
+  },
+  "dependencies": {
+    "camelcase": "^4.0.0",
+    "chalk": "^1.1.3",
+    "commander": "^2.9.0",
+    "decamelize": "^1.2.0",
+    "fs-extra": "^4.0.2",
+    "prettyjson": "^1.2.1",
+    "string-argv": "0.0.2"
+  }
+}
