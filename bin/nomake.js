@@ -6,7 +6,7 @@ const camelCase = require("camelcase");
 const decamelize = require("decamelize");
 const prettyjson = require("prettyjson");
 const fse = require("fs-extra");
-const { execute, register, cmd } = require("../src/exec");
+const { execute, register, cmd, killChildren } = require("../src/exec");
 
 let ok = false;
 
@@ -46,10 +46,10 @@ async function loadMakeFile() {
   for (t in global.target) {
     (function(t, oldTarget) {
       // Wrap it
-      global.target[t] = function() {
+      global.target[t] = async function() {
         if (!oldTarget.done) {
           oldTarget.done = true;
-          oldTarget.result = oldTarget.apply(oldTarget, arguments);
+          oldTarget.result = await oldTarget.apply(oldTarget, arguments);
         }
         return oldTarget.result;
       };
@@ -64,14 +64,19 @@ program.arguments("<cmd> [args...]").action(function(cmd, args) {
   ok = true;
   // console.log(cmds);
   // process.exit();
-  return loadMakeFile().then(() => {
-    var camelCmd = camelCase(cmd);
-    if (camelCmd in global.target) {
-      global.target[camelCmd].apply(global.target, args);
-    } else {
-      console.log(chalk.red("no such target: " + camelCmd));
-    }
-  });
+  return loadMakeFile()
+    .then(async () => {
+      var camelCmd = camelCase(cmd);
+      if (camelCmd in global.target) {
+        await global.target[camelCmd].apply(global.target, args);
+      } else {
+        console.log(chalk.red("no such target: " + camelCmd));
+      }
+    })
+    .catch(e => {
+      killChildren();
+      console.log("killed children");
+    });
 });
 
 program.on("--help", function() {
@@ -97,11 +102,16 @@ if (dashesLoc > -1) {
 program.parse(processArgs);
 
 if (!program.args.length) {
-  loadMakeFile().then(async () => {
-    if ("default" in global.target) {
-      await global.target.default();
-    } else {
-      program.outputHelp(makeRed);
-    }
-  });
+  loadMakeFile()
+    .then(async () => {
+      if ("default" in global.target) {
+        await global.target.default();
+      } else {
+        program.outputHelp(makeRed);
+      }
+    })
+    .catch(e => {
+      killChildren();
+      console.log("killed children");
+    });
 }
