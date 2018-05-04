@@ -75,7 +75,9 @@ program.arguments("<cmd> [args...]").action(function(cmd, args) {
     })
     .catch(e => {
       killChildren();
+      console.error(e);
       console.log("killed children");
+      process.exit(1);
     });
 });
 
@@ -113,5 +115,6 @@ if (!program.args.length) {
     .catch(e => {
       killChildren();
       console.log("killed children");
+      process.exit(1);
     });
 }
