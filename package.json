@@ -34,6 +34,7 @@
     "commander": "^2.9.0",
     "decamelize": "^1.2.0",
     "fs-extra": "^4.0.2",
+    "pidtree": "^0.3.0",
     "prettyjson": "^1.2.1",
     "string-argv": "0.0.2",
     "tree-kill": "^1.2.0"

@@ -2,7 +2,8 @@ const cp = require("child_process");
 const camelCase = require("camelcase");
 const stringArgv = require("string-argv");
 const chalk = require("chalk");
-const kill = require("tree-kill");
+// const kill = require("tree-kill");
+// const treeKill = require("./TreeKill");
 
 function execute(command, returnStdout, opts) {
   const executable = command.split(" ")[0];
@@ -28,34 +29,86 @@ function cmd(cmd) {
   };
 }
 
-const childList = [];
+// const childList = [];
 
-function killChildren() {
-  for (child of childList) {
-    // console.log(`Killing process ${child.pid}`);
-    kill(child.pid);
-  }
-}
+// function killChildren() {
+//   for (child of childList) {
+//     // console.log(`Killing process ${child.pid}`);
+//     treeKill(child.pid, "SIGTERM");
+//   }
+// }
+
+let colorIndex = 0;
+
+const colors = [
+  "bgGreen",
+  "bgYellow",
+  "bgBlue",
+  "bgMagenta",
+  "bgCyan",
+  "bgWhite",
+  "bgBlackBright",
+  "bgGreenBright",
+  "bgYellowBright",
+  "bgBlueBright",
+  "bgMagentaBright",
+  "bgCyanBright",
+  "bgWhiteBright"
+];
 
 function spawn(cmd, args, opts) {
   // const executable = cmd.substring(0, cmd.indexOf(' '));
   // const args = cmd.substr(cmd.indexOf(' ') + 1);
+  const currentColorIndex = colorIndex;
+  colorIndex = (colorIndex + 1) % colors.length;
+
   return new Promise((resolve, reject) => {
     const vargs = stringArgv(args);
+    let processName = cmd + " " + vargs;
+    if (opts && opts.cwd) {
+      processName = opts.cwd + " " + processName;
+    }
+    processName = `[${processName}]`;
     try {
       const child = cp.spawn(cmd, vargs, {
         shell: false,
-        stdio: "inherit",
+        stdio: "pipe",
+        detached: false,
         ...opts
       });
+      // console.log(child.pid);
 
-      childList.push(child);
+      // childList.push(child);
+
+      function logData(data) {
+        const text = data.toString();
+        const lines = text.split("\n");
+
+        const paddedLines = lines.map(function(line, index) {
+          let coloredLine = "";
+          if (line) {
+            coloredLine =
+              chalk[colors[currentColorIndex]](processName) + line + "\n";
+          }
+          return coloredLine;
+        });
+        process.stdout.write(paddedLines.join(""));
+        // console.log(`stdout: ${data}`);
+      }
+
+      child.stdout.on("data", data => {
+        logData(data);
+      });
+
+      child.stderr.on("data", data => {
+        logData(data);
+      });
 
       child.on("error", err => {
         const message = `process ${cmd} ${vargs} Failed to start`;
         console.log(chalk.bgRed(message));
         reject(new Error(message));
-        childList.splice(childList.indexOf(child), 1);
+        // childList.splice(childList.indexOf(child), 1);
       });
 
       child.on("close", code => {
@@ -64,7 +117,7 @@ function spawn(cmd, args, opts) {
           console.log(chalk.bgRed(message));
           reject(new Error(message));
         }
-        childList.splice(childList.indexOf(child), 1);
+        // childList.splice(childList.indexOf(child), 1);
         resolve();
       });
     } catch (e) {
@@ -109,6 +162,5 @@ module.exports = {
   execute,
   spawn,
   exec,
-  register,
-  killChildren
+  register
 };

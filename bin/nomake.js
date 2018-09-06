@@ -6,6 +6,8 @@ const camelCase = require("camelcase");
 const decamelize = require("decamelize");
 const prettyjson = require("prettyjson");
 const fse = require("fs-extra");
+const treeKill = require("../src/TreeKill");
+
 const { execute, register, cmd, killChildren } = require("../src/exec");
 
 let ok = false;
@@ -37,7 +39,7 @@ function makeRed(txt) {
 
 async function loadMakeFile() {
   const scriptName = program.file || "makefile.js";
-  if (!await exists(scriptName)) {
+  if (!(await exists(scriptName))) {
     console.log("ShellJS: script not found (" + scriptName + ")");
     process.exit(1);
   }
@@ -74,10 +76,15 @@ program.arguments("<cmd> [args...]").action(function(cmd, args) {
       }
     })
     .catch(e => {
-      killChildren();
+      treeKill(process.pid, "SIGINT");
       console.error(e);
-      console.log("killed children");
-      process.exit(1);
+      // process.kill(process.pid, "SIGTERM");
+      // setTimeout(() => {
+      //   killChildren();
+      //   console.error(e);
+      //   console.log("killed children");
+      //   process.exit(1);
+      // }, 100);
     });
 });
 
@@ -113,8 +120,11 @@ if (!program.args.length) {
       }
     })
     .catch(e => {
-      killChildren();
+      treeKill(process.pid, "SIGINT");
       console.log("killed children");
-      process.exit(1);
     });
 }
+
+process.on("SIGINT", function() {
+  // This is needed to log process close
+});
