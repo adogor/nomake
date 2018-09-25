@@ -121,7 +121,7 @@ if (!program.args.length) {
     })
     .catch(e => {
       treeKill(process.pid, "SIGINT");
-      console.log("killed children");
+      console.log(e);
     });
 }
 
