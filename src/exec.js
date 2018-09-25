@@ -87,6 +87,7 @@ function spawn(cmd, args, opts) {
         const paddedLines = lines.map(function(line, index) {
           let coloredLine = "";
           if (line) {
+            // console.log(colors[currentColorIndex]);
             coloredLine =
               chalk[colors[currentColorIndex]](processName) + line + "\n";
           }
