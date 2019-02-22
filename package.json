@@ -1,6 +1,6 @@
 {
   "name": "nomake",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Node.js make, use async/await with few helpers to script",
   "keywords": [
     "npm",
