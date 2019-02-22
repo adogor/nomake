@@ -78,13 +78,7 @@ program.arguments("<cmd> [args...]").action(function(cmd, args) {
     .catch(e => {
       treeKill(process.pid, "SIGINT");
       console.error(e);
-      // process.kill(process.pid, "SIGTERM");
-      // setTimeout(() => {
-      //   killChildren();
-      //   console.error(e);
-      //   console.log("killed children");
-      //   process.exit(1);
-      // }, 100);
+      process.exit(1);
     });
 });
 
