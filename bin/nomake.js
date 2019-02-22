@@ -19,10 +19,11 @@ global.cmd = cmd;
 global.register = register;
 
 global.prettyjson = prettyjson.render;
+global.fse = fse;
 
-for (fseFunctionName in fse) {
-  global[fseFunctionName] = fse[fseFunctionName];
-}
+// for (fseFunctionName in fse) {
+//   global[fseFunctionName] = fse[fseFunctionName];
+// }
 
 async function exists(filePath) {
   try {
