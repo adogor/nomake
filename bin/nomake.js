@@ -4,7 +4,6 @@ const program = require("commander");
 const chalk = require("chalk");
 const camelCase = require("camelcase");
 const decamelize = require("decamelize");
-const prettyjson = require("prettyjson");
 const fse = require("fs-extra");
 const treeKill = require("../src/TreeKill");
 
@@ -18,30 +17,15 @@ global.exec = execute;
 global.cmd = cmd;
 global.register = register;
 
-global.prettyjson = prettyjson.render;
 global.fse = fse;
-
-// for (fseFunctionName in fse) {
-//   global[fseFunctionName] = fse[fseFunctionName];
-// }
-
-async function exists(filePath) {
-  try {
-    const val = await fse.access(filePath, fse.constants.F_OK);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
 function makeRed(txt) {
   return chalk.red(txt); // display the help text in red on the console
 }
 
 async function loadMakeFile() {
   const scriptName = program.file || "makefile.js";
-  if (!(await exists(scriptName))) {
-    console.log("ShellJS: script not found (" + scriptName + ")");
+  if (!(await fse.pathExists(scriptName))) {
+    console.log("nomake: script not found (" + scriptName + ")");
     process.exit(1);
   }
   require(require.resolve(path.resolve(process.cwd(), scriptName)));
@@ -63,10 +47,7 @@ async function loadMakeFile() {
 program.option("-f, --file <makefile.js>", "Makefile");
 
 program.arguments("<cmd> [args...]").action(function(cmd, args) {
-  //console.log(cmd, args)
   ok = true;
-  // console.log(cmds);
-  // process.exit();
   return loadMakeFile()
     .then(async () => {
       var camelCmd = camelCase(cmd);
@@ -85,7 +66,6 @@ program.arguments("<cmd> [args...]").action(function(cmd, args) {
 
 program.on("--help", function() {
   return loadMakeFile().then(() => {
-    // program.outputHelp(make_red);
     console.log("Available targets:");
     for (t in global.target) {
       console.log("  " + decamelize(t, "-"));

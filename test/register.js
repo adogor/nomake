@@ -1,4 +1,6 @@
-register('npm');
+register("npm");
 
-npm('--version', null, false);
-console.log('jj')
+target.default = async () => {
+  await npm("--version", null, false);
+  console.log("jj");
+};
